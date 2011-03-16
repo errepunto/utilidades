@@ -9,12 +9,12 @@ import time
 import traceback
 import random
 
-__author__ = "Rubén C. (errepunto)"
-__copyright__ = "Copyright 2011, Rubén C."
-__credits__ = ["Rubén C. (errepunto)"]
+__author__ = "Rubén C. J. (errepunto)"
+__copyright__ = "Copyright 2011, Rubén C. J."
+__credits__ = ["Rubén C. J. (errepunto)"]
 __license__ = "BSD"
 __version__ = "1.0"
-__maintainer__ = "Rubén C. (errepunto)"
+__maintainer__ = "Rubén C. J. (errepunto)"
 __email__ = "asf.dominio AATT gmail.com"
 __status__ = "Development"
 

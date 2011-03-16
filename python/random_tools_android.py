@@ -12,6 +12,14 @@ import hashlib
 import base64
 import datetime
 
+try:
+    import android
+    ANDROID = True
+except Exception, ex:
+    print "This isn't an Android Phone"
+    ANDROID = False
+
+
 __author__ = "Rubén C. J. (errepunto)"
 __copyright__ = "Copyright 2011, Rubén C. J."
 __credits__ = ["Rubén C. J. (errepunto)"]
@@ -20,6 +28,7 @@ __version__ = "1.0"
 __maintainer__ = "Rubén C. J. (errepunto)"
 __email__ = "asf.dominio AATT gmail.com"
 __status__ = "Development"
+
 
 # Chars
 LOWER_LETTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -72,6 +81,8 @@ DIGEST_MD5_SHA1_B64 = 11
 # TOOLS
 #
 def toBase(num, base):
+    """Convert a number from base 10 to another base
+    """
     a = num
     s = ""
     while a > 0:
@@ -83,6 +94,8 @@ def toBase(num, base):
 
 
 def fillLeft(string, fillchar, length):
+    """Fill a string from the left with the specified character
+    """
     string = str(string)
     l = length - len(string)
     if l < 0:
@@ -92,6 +105,8 @@ def fillLeft(string, fillchar, length):
 
 
 def fillRight(string, fillchar, length):
+    """Fill a string from the right with the specified character
+    """
     string = str(string)
     l = length - len(string)
     if l < 0:
@@ -100,11 +115,12 @@ def fillRight(string, fillchar, length):
         return string+fillchar*l
 
 #
-# METHODS
+# FUNCTIONS
 #
 
 def getRandomString(length, chars=DEFAULT_CHARS):
-    """Returns a string whith 'length' chars long whith chars specified"""
+    """Returns a random string whith 'length' chars long whith chars specified
+    """
     c = ""
     for i in xrange(0, length):
         c += random.choice(chars)
@@ -112,6 +128,8 @@ def getRandomString(length, chars=DEFAULT_CHARS):
 
 
 def getPasswd(length, digest=DIGEST_PLAIN, chars=DEFAULT_CHARS):
+    """Generates a random password with specified chars. Password can be processed
+    to obtain a hash digest."""
     passwd = getRandomString(length, chars)
     ret = passwd
     
@@ -144,16 +162,19 @@ def getPasswd(length, digest=DIGEST_PLAIN, chars=DEFAULT_CHARS):
 
 
 def getNumberBetween(min, max):
+    """Get a random integer between min and max, both included"""
     num = random.randint(min, max)
     return num
 
 
 def getNumber(max):
+    """Get a random integer between zero and max, both included"""
     return getNumberBetween(0, max)
 
 
-def dice(faces, rolls=1):
-    """Return """
+def dice(faces=6, rolls=1):
+    """Return a random dice roll.You can specify number of dice's faces and
+    number the dice is rolled"""
     ret = []
     for i in xrange(0, rolls):
         ret.append(getNumberBetween(1, faces))
@@ -161,6 +182,10 @@ def dice(faces, rolls=1):
 
 
 def dices(rolls):
+    """Advanced dice roll. You must pass a string with dice rolls separated by
+    commas. A dice roll is specified in the format 'rolls+d+faces'. For example,
+    you want to roll two dices with 6 and 10 faces each one, and two times each,
+    you can call this function like this: dices('2d6,2d10')"""
     ret = []
     for i in rolls:
         try:
@@ -173,8 +198,9 @@ def dices(rolls):
 
 
 def randomStringWithRules(rule):
-    """Rule components are separated by commas. Each rule specifies type and lenght
-    separated by '-'. For example "lower-3" means "three lower case chars"
+    """Complex random string generator.Rule components are separated by commas.
+    Each rule specifies type and lenght separated by '-'. For example "lower-3"
+    means "three lower-case chars"
     """
     components = rule.lower().replace(" ", "").split(",")
     s = ""
@@ -190,6 +216,7 @@ def randomStringWithRules(rule):
 
 
 def randomTime(start="00:00", stop="23:59"):
+    """Generate a random time between two specified"""
     parts1 = start.split(":")
     parts2 = stop.split(":")
     
@@ -206,6 +233,7 @@ def randomTime(start="00:00", stop="23:59"):
 
 
 def randomDate(start="01/01/2000", stop="31/12/2010"):
+    """Generate a random date"""
     parts1 = start.split("/")
     parts2 = stop.split("/")
     
@@ -223,7 +251,9 @@ def randomDate(start="01/01/2000", stop="31/12/2010"):
     return time.strftime('%d/%m/%Y', time.localtime(seconds))
 
 
-def main():
+def test():
+    """Simple test program"""
+    
     print "toBase(12345, 7):                   ", toBase(12345, 7)
     print "toBase(12345, 2):                   ", toBase(12345, 2)
     print "fillLeft('123', '0', 5):            ", fillLeft('123', '0', 5)
@@ -243,10 +273,129 @@ def main():
     print "randomStringWithRules('symbols-1,numbers-3,lower-5'): ", randomStringWithRules('symbols-1,numbers-3,letters-5')
     print "randomTime('15:50', '17:10'):       ", randomTime('15:50', '17:10')
     print "randomDate('3/3/2003', '5/5/2005'): ", randomDate('3/3/2003', '5/5/2005')
+
+
+def menu_principal(droid):
+    droid.dialogCreateAlert("Elija el tipo ")
+    droid.dialogSetItems(["Textos", "Numeros", "Dados", "Horas y fechas", "Salir"])
+    droid.dialogShow()
+    result=droid.dialogGetResponse().result
+    if result.has_key("item"):
+        res = result["item"]
+        if res == 0:
+            menu_textos(droid)
+        elif res == 1:
+            menu_numeros(droid)
+        elif res == 2:
+            menu_dados(droid)
+        elif res == 3:
+            menu_fechahora(droid)
+        else:
+            print "No se ha elegido ninguno"
+            return 0
+    else:
+        return 0
+
+
+# TEXTOS
+
+def menu_textos(droid):
+    droid.dialogCreateAlert("Elija opción")
+    droid.dialogSetItems(["Texto", "Contraseña", "Texto con patrón", "Atrás"])
+    droid.dialogShow()
+    result=droid.dialogGetResponse().result
+    if result.has_key("item"):
+        res = result["item"]
+        if res == 0:
+            menu_textos_texto(droid)
+        elif res == 1:
+            menu_textos_passwd(droid)
+        elif res == 2:
+            menu_textos_patron(droid)
+        else:
+            print "No se ha elegido ninguno"
+            menu_principal(droid)
+    else:
+        menu_principal(droid)
+
+
+def menu_textos_texto(droid):
+    droid.dialogCreateAlert("Texto aleatorio")
+    #droid.dialogSetItems
     
+
+# NUMEROS
+
+def menu_numeros(droid):
+    droid.dialogCreateAlert("Elija opción")
+    droid.dialogSetItems(["Entero", "Entero entre", "Atrás"])
+    droid.dialogShow()
+    result=droid.dialogGetResponse().result
+    if result.has_key("item"):
+        res = result["item"]
+        if res == 0:
+            menu_numeros_entero(droid)
+        elif res == 1:
+            menu_numeros_entero_entre(droid)
+        else:
+            print "No se ha elegido ninguno"
+            menu_principal(droid)
+    else:
+        menu_principal(droid)
+
+
+# DADOS
+
+def menu_dados(droid):
+    droid.dialogCreateAlert("Elija opción")
+    droid.dialogSetItems(["Dado simple", "Varios dados", "Atrás"])
+    droid.dialogShow()
+    result=droid.dialogGetResponse().result
+    if result.has_key("item"):
+        res = result["item"]
+        if res == 0:
+            menu_textos_dados_simple(droid)
+        elif res == 1:
+            menu_textos_dados_varios(droid)
+        else:
+            print "No se ha elegido ninguno"
+            menu_principal(droid)
+    else:
+        menu_principal(droid)
+
+
+# FECHAS Y HORAS
+
+def menu_fechahora(droid):
+    droid.dialogCreateAlert("Elija opción")
+    droid.dialogSetItems(["Texto", "Contraseña", "Texto con patrón", "Atrás"])
+    droid.dialogShow()
+    result=droid.dialogGetResponse().result
+    if result.has_key("item"):
+        res = result["item"]
+        if res == 0:
+            menu_fecha(droid)
+        elif res == 1:
+            menu_hora(droid)
+        else:
+            print "No se ha elegido ninguno"
+            menu_principal(droid)
+    else:
+        menu_principal(droid)
+
+
+
+def android_main():
+    """Android program"""
+    droid = android.Android()
+    eleccion = menu_principal(droid)
+
     
 if __name__ == "__main__":
-    retvalue = main()
+    if ANDROID:
+        retvalue = android_main()
+    else:
+        retvalue = test()
     
     sys.exit(retvalue)
     
