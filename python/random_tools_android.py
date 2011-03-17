@@ -131,8 +131,11 @@ def getPasswd(length, digest=DIGEST_PLAIN, chars=DEFAULT_CHARS):
     """Generates a random password with specified chars. Password can be processed
     to obtain a hash digest."""
     passwd = getRandomString(length, chars)
-    ret = passwd
-    
+    ret = getDigest(digest, passwd)
+
+
+def getDigest(digest, passwd):
+    """Get digest for a string"""
     if digest == DIGEST_PLAIN:
         ret = passwd
     elif digest == DIGEST_PLAIN_B64:
@@ -210,7 +213,7 @@ def randomStringWithRules(rule):
         if t not in CHARS:
             s = "Invalid rule component: "+c
             break
-        s += getRandomString(int(n, 10), CHARS[t])
+        s += getRandomString(int(n, 10), chars=CHARS[t])
         idx += 1
     return s
 
@@ -251,6 +254,19 @@ def randomDate(start="01/01/2000", stop="31/12/2010"):
     return time.strftime('%d/%m/%Y', time.localtime(seconds))
 
 
+def randomPick(s):
+    """Pick a random element from a comma-separated list"""
+    l = s.split(",")
+    return random.choice(l)
+
+
+def shuffleList(s):
+    """Randomice a comma-separated list"""
+    l = s.split(",")
+    random.shuffle(l)
+    return ",".join(l)
+
+
 def test():
     """Simple test program"""
     
@@ -270,9 +286,11 @@ def test():
     print "dice(6):                            ", dice(6)
     print "dice(12, 3):                        ", dice(12, 3)
     print "dices(['2D6', '3D10']):             ", dices(['2D6', '3D10'])
-    print "randomStringWithRules('symbols-1,numbers-3,lower-5'): ", randomStringWithRules('symbols-1,numbers-3,letters-5')
+    print "randomStringWithRules('symbols-1,numbers-3,lower-5'): ", randomStringWithRules('symbols-1,numbers-3,lower-5')
     print "randomTime('15:50', '17:10'):       ", randomTime('15:50', '17:10')
     print "randomDate('3/3/2003', '5/5/2005'): ", randomDate('3/3/2003', '5/5/2005')
+    print "randomPick('1,2,a,b'):              ", randomPick('1,2,a,b')
+    print "shuffleList('1,2,a,b'):             ", shuffleList('1,2,a,b')
 
 
 def menu_principal(droid):
@@ -289,7 +307,7 @@ def menu_principal(droid):
         elif res == 2:
             menu_dados(droid)
         elif res == 3:
-            menu_fechahora(droid)
+            menu_misc(droid)
         else:
             print "No se ha elegido ninguno"
             return 0
@@ -364,9 +382,9 @@ def menu_dados(droid):
         menu_principal(droid)
 
 
-# FECHAS Y HORAS
+# MISC
 
-def menu_fechahora(droid):
+def menu_misc(droid):
     droid.dialogCreateAlert("Elija opción")
     droid.dialogSetItems(["Texto", "Contraseña", "Texto con patrón", "Atrás"])
     droid.dialogShow()
